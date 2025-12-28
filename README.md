@@ -2,6 +2,8 @@
 
 A PowerShell script with GUI for advanced mass renaming of files or folders within a specific folder. Supports case-sensitivity, regular expressions, exclusion of file extensions, insert before/after match, simulation with preview, undo function, multilingual interface (English/German), and CLI mode.
 
+![GUI Screenshot](https://github.com/Flashdown/JoyfulRenaming/blob/main/JoyfulRenaming.png)
+
 ## Features
 
 - **GUI Interface**: User-friendly Windows Forms GUI for easy operation, with multilingual support (English as default, German available).
