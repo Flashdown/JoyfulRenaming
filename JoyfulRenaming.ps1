@@ -1,4 +1,4 @@
-﻿# JoyfulRenaming v0.1 Copyright (C) 2025 Enrico Heine https://github.com/Flashdown/JoyfulRenaming
+# JoyfulRenaming v0.1 Copyright (C) 2025 Enrico Heine https://github.com/Flashdown/JoyfulRenaming
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License Version 3 as
@@ -361,7 +361,7 @@ function Generate-CLIString {
         [bool]$simulate
     )
 
-    $cli = ".\FileRenamer.ps1 -FolderPath `"$folderPath`" -Search `"$search`" -Replace `"$replace`""
+    $cli = ".\JoyfulRenaming.ps1 -FolderPath `"$folderPath`" -Search `"$search`" -Replace `"$replace`""
     if ($caseSensitive) { $cli += " -CaseSensitive" }
     if ($useRegex) { $cli += " -Regex" }
     if ($excludeExt) { $cli += " -ExcludeExt" }
