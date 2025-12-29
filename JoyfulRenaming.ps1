@@ -1,4 +1,4 @@
-# JoyfulRenaming v0.1 Copyright (C) 2025 Enrico Heine https://github.com/Flashdown/JoyfulRenaming
+﻿# JoyfulRenaming v0.2 - Copyright (C) 2025 Enrico Heine https://github.com/Flashdown/JoyfulRenaming
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License Version 3 as
@@ -34,12 +34,12 @@ Add-Type -AssemblyName System.Drawing
 $undoList = @()
 
 #Version
-$JoyfulRenaming_version= "v0.1"
+$JoyfulRenaming_version= "v0.2"
 
 # Übersetzungen definieren
 $translations = @{
     "English" = @{
-        "FormTitle" = "JoyfulRenaming" + " " + $JoyfulRenaming_version
+        "FormTitle" = "JoyfulRenaming"
         "FolderLabel" = "Folder Path:"
         "BrowseButton" = "Browse"
         "SearchLabel" = "Search for:"
@@ -76,7 +76,7 @@ $translations = @{
         "LanguageLabel" = "Language:"
     }
     "Deutsch" = @{
-        "FormTitle" = "JoyfulRenaming" + " " + $JoyfulRenaming_version
+        "FormTitle" = "JoyfulRenaming"
         "FolderLabel" = "Ordnerpfad:"
         "BrowseButton" = "Durchsuchen"
         "SearchLabel" = "Suchen nach:"
@@ -133,7 +133,7 @@ function Perform-Rename {
 
     $lang = $translations[$currentLanguage]
 
-    if (-not (Test-Path $folderPath)) {
+    if (-not (Test-Path -LiteralPath $folderPath)) {
         Write-Error $lang["FolderNotExist"]
         return
     }
@@ -150,7 +150,7 @@ function Perform-Rename {
         return
     }
 
-    $items = if ($renameFolders) { Get-ChildItem -Path $folderPath -Directory } else { Get-ChildItem -Path $folderPath -File }
+    $items = if ($renameFolders) { Get-ChildItem -LiteralPath $folderPath -Directory } else { Get-ChildItem -LiteralPath $folderPath -File }
 
     foreach ($item in $items) {
         $originalName = $item.Name
@@ -188,12 +188,12 @@ function Perform-Rename {
 
         if ($newName -ne $originalName) {
             $newPath = Join-Path -Path $folderPath -ChildPath $newName
-            if (Test-Path $newPath) {
+            if (Test-Path -LiteralPath $newPath) {
                 Write-Warning ($lang["FileExistsWarning"] -f $newName, $originalName)
                 continue
             }
             $script:undoList += @{OriginalFullName = $item.FullName; NewFullName = $newPath}
-            Rename-Item -Path $item.FullName -NewName $newName
+            Rename-Item -LiteralPath $item.FullName -NewName $newName
         }
     }
     Write-Host $lang["RenameComplete"]
@@ -218,7 +218,7 @@ function Perform-Simulate {
 
     $lang = $translations[$currentLanguage]
 
-    if (-not (Test-Path $folderPath)) {
+    if (-not (Test-Path -LiteralPath $folderPath)) {
         if ($rtbBefore) { [System.Windows.Forms.MessageBox]::Show($lang["FolderNotExist"], $lang["Error"]) }
         else { Write-Error $lang["FolderNotExist"] }
         return
@@ -243,7 +243,7 @@ function Perform-Simulate {
     $effectiveSearch = if ($useRegex) { $search } else { [regex]::Escape($search) }
     $regex = New-Object System.Text.RegularExpressions.Regex $effectiveSearch, $regexOptions
 
-    $items = if ($renameFolders) { Get-ChildItem -Path $folderPath -Directory } else { Get-ChildItem -Path $folderPath -File }
+    $items = if ($renameFolders) { Get-ChildItem -LiteralPath $folderPath -Directory } else { Get-ChildItem -LiteralPath $folderPath -File }
 
     $previewBefore = @()
     $count = 0
@@ -393,7 +393,7 @@ if ($PSBoundParameters.Count -gt 0) {
 if ($guiMode) {
     # GUI erstellen
     $form = New-Object System.Windows.Forms.Form
-    $form.Size = New-Object System.Drawing.Size(800, 900)  # Erhöht auf 800 für mehr Platz
+    $form.Size = New-Object System.Drawing.Size(815, 842)
     $form.StartPosition = "CenterScreen"
     $form.Font = New-Object System.Drawing.Font("Segoe UI", 9)
 
@@ -415,7 +415,7 @@ if ($guiMode) {
         $currentLanguage = $comboLanguage.SelectedItem
         $lang = $translations[$currentLanguage]
 
-        $form.Text = $lang["FormTitle"]
+        $form.Text = $lang["FormTitle"] + " " + $JoyfulRenaming_version
         $labelFolder.Text = $lang["FolderLabel"]
         $btnBrowse.Text = $lang["BrowseButton"]
         $labelSearch.Text = $lang["SearchLabel"]
@@ -607,8 +607,8 @@ if ($guiMode) {
         foreach ($item in $script:undoList) {
             $originalName = Split-Path $item.OriginalFullName -Leaf
             $newFullName = $item.NewFullName
-            if (Test-Path $newFullName) {
-                Rename-Item -Path $newFullName -NewName $originalName
+            if (Test-Path -LiteralPath $newFullName) {
+                Rename-Item -LiteralPath $newFullName -NewName $originalName
             } else {
                 [System.Windows.Forms.MessageBox]::Show(($lang["FileNotFoundWarning"] -f $newFullName), $lang["Warning"])
             }
@@ -675,7 +675,21 @@ if ($guiMode) {
     $rtbCLI.ReadOnly = $true
     $rtbCLI.ScrollBars = "Horizontal"
     $form.Controls.Add($rtbCLI)
-
+    
+    # Label für Copyright
+    $labelCopyright = New-Object System.Windows.Forms.LinkLabel
+    $labelCopyright.Location = New-Object System.Drawing.Point(10, 786)
+    $labelCopyright.Size = New-Object System.Drawing.Size(780, 20)
+    $labelCopyright.Text = "© 2025 Enrico Heine - https://github.com/Flashdown/JoyfulRenaming"
+    $labelCopyright.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    $start = $labelCopyright.Text.IndexOf("https://")
+    $length = $labelCopyright.Text.Length - $start
+    [void]$labelCopyright.Links.Add($start, $length, "https://github.com/Flashdown/JoyfulRenaming")
+    $labelCopyright.Add_LinkClicked({
+        Start-Process $_.Link.LinkData
+    })
+    $form.Controls.Add($labelCopyright)
+    
     # Initiale Texte setzen
     Update-GUIText
 
@@ -696,6 +710,30 @@ if ($guiMode) {
             $btnSimulate.PerformClick()
         }
     }
+
+    # Verstecken des Konsolenfensters
+    Add-Type -Name Window -Namespace Console -MemberDefinition '
+     [DllImport("Kernel32.dll")]
+     public static extern IntPtr GetConsoleWindow();
+
+     [DllImport("user32.dll")]
+     public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
+    '
+    $consolePtr = [Console.Window]::GetConsoleWindow()
+    # Minimieren: 6 Verstecken: 0
+    [Console.Window]::ShowWindow($consolePtr, 0)
+
+    # --- Custom Icon für die Titelleist ---
+    $base64Icon = "empty"
+    if ($base64Icon -ne "empty" -and $base64Icon.Trim() -ne "") {
+      try {
+            $iconBytes = [Convert]::FromBase64String($base64Icon)
+            $stream = New-Object System.IO.MemoryStream(,$iconBytes)
+            $form.Icon = [System.Drawing.Icon]::FromHandle((New-Object System.Drawing.Bitmap($stream)).GetHicon())
+            $stream.Close()
+          } catch { Write-Warning "Custom Icon konnte nicht geladen werden: $_" }
+    }
+    # --- Ende Custom Icon ---
 
     # GUI anzeigen
     $form.ShowDialog()
