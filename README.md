@@ -20,11 +20,8 @@ A PowerShell script with GUI for advanced mass renaming of files or folders with
 
 ## Installation
 
-1. Save the code as a `.ps1` file (e.g., `JoyfulRenaming.ps1`).
-2. Open PowerShell and navigate to the file's directory.
-3. Run the script: `.\JoyfulRenaming.ps1` (for GUI mode).
-
-**Note**: To bypass the execution policy if necessary: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
+1. Download and unpack the ZIP Release
+2. Execute run.cmd (for GUI mode)
 
 ## Usage
 
